@@ -1,0 +1,13 @@
+# Python dependencies for To-Do List CLI Application
+
+# No external dependencies required for core functionality
+# The application uses only Python standard library modules:
+# - json
+# - os
+# - sys
+# - datetime
+
+# Testing (optional, for running tests)
+pytest>=7.4.0
+
+# If you want to use pytest instead of unittest, uncomment above

@@ -77,9 +77,7 @@ pipeline {
             echo "✗ Pipeline failed!"
         }
         always {
-            node {
-                cleanWs()
-            }
+            deleteDir()
         }
     }
 }

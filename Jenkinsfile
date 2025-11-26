@@ -6,8 +6,8 @@ pipeline {
         IMAGE_NAME = 'akshat09128/cicd'
         IMAGE_TAG = "${BUILD_NUMBER}"
 
-        GITHUB_CREDS = credentials('Github-JenkinCreds')
-        DOCKERHUB_CREDS = credentials('Docker-Jenkins')
+        GITHUB_CREDS = credentials('githubcreds')
+        DOCKERHUB_CREDS = credentials('dockerhubcreds')
 
         PYTHON = 'C:\\Users\\Akshat\\AppData\\Local\\Programs\\Python\\Python313\\python.exe'
     }
@@ -77,7 +77,10 @@ pipeline {
             echo "✗ Pipeline failed!"
         }
         always {
-            deleteDir()
+            script {
+                // Ensures deleteDir() runs in the correct node context
+                deleteDir()
+            }
         }
     }
 }

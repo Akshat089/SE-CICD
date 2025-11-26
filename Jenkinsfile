@@ -3,7 +3,7 @@ pipeline {
     
     environment {
         DOCKERHUB_USERNAME = 'akshat09128'
-        IMAGE_NAME = 'akshat09128/cicd'
+        REPO_NAME = 'cicd'                    // just the repo name
         IMAGE_TAG = "${BUILD_NUMBER}"
 
         GITHUB_CREDS = credentials('githubcreds')
@@ -38,17 +38,15 @@ pipeline {
         stage('Run Tests') {
             steps {
                 echo "Running Python tests..."
-                bat """
-                    venv\\Scripts\\python.exe -m pytest tests\\test_todo.py -v
-                """
+                bat "venv\\Scripts\\python.exe -m pytest tests\\test_todo.py -v"
             }
         }
 
         stage('Build Docker Image') {
             steps {
                 echo "Building Docker image..."
-                bat "docker build -t %DOCKERHUB_USERNAME%/%IMAGE_NAME%:%IMAGE_TAG% ."
-                bat "docker build -t %DOCKERHUB_USERNAME%/%IMAGE_NAME%:latest ."
+                bat "docker build -t ${DOCKERHUB_USERNAME}/${REPO_NAME}:${IMAGE_TAG} ."
+                bat "docker tag ${DOCKERHUB_USERNAME}/${REPO_NAME}:${IMAGE_TAG} ${DOCKERHUB_USERNAME}/${REPO_NAME}:latest"
             }
         }
 
@@ -56,31 +54,24 @@ pipeline {
             steps {
                 echo "Pushing Docker image..."
                 bat "docker login -u %DOCKERHUB_CREDS_USR% -p %DOCKERHUB_CREDS_PSW%"
-                bat "docker push %DOCKERHUB_USERNAME%/%IMAGE_NAME%:%IMAGE_TAG%"
-                bat "docker push %DOCKERHUB_USERNAME%/%IMAGE_NAME%:latest"
+                bat "docker push ${DOCKERHUB_USERNAME}/${REPO_NAME}:${IMAGE_TAG}"
+                bat "docker push ${DOCKERHUB_USERNAME}/${REPO_NAME}:latest"
                 bat "docker logout"
             }
         }
 
         stage('Verify Docker Image') {
             steps {
-                bat "docker images | findstr %IMAGE_NAME%"
+                bat "docker images | findstr ${REPO_NAME}"
             }
         }
     }
 
     post {
-        success {
-            echo "✓ Pipeline completed successfully!"
-        }
-        failure {
-            echo "✗ Pipeline failed!"
-        }
+        success { echo "✓ Pipeline completed successfully!" }
+        failure { echo "✗ Pipeline failed!" }
         always {
-            script {
-                // Ensures deleteDir() runs in the correct node context
-                deleteDir()
-            }
+            script { deleteDir() }
         }
     }
 }

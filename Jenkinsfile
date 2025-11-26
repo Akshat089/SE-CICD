@@ -77,7 +77,9 @@ pipeline {
             echo "✗ Pipeline failed!"
         }
         always {
-            cleanWs()
+            node {
+                cleanWs()
+            }
         }
     }
 }
